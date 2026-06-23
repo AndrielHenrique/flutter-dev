@@ -17,7 +17,6 @@ migrate_working_dir/
 *.ipr
 *.iws
 .idea/
-.env
 
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
@@ -44,71 +43,23 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-# Flutter/Dart
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-.packages
-.pub-cache/
-.pub/
-build/
+# dependências
 
-# IDE
-.idea/
-.vscode/
-*.iml
+node_modules/
 
-# Android
-android/.gradle/
-android/app/debug
-android/app/profile
-android/app/release
-android/local.properties
-*.keystore
-*.jks
-
-# iOS
-ios/Pods/
-ios/.symlinks/
-ios/Flutter/.last_build_id
-ios/Flutter/Flutter.framework
-ios/Flutter/App.framework
-
-# macOS
-macos/Pods/
-
-# Linux
-linux/flutter/ephemeral/
-
-# Windows
-windows/flutter/ephemeral/
-
-# Web
-build/web/
-
-# Firebase
-google-services.json
-GoogleService-Info.plist
-firebase_options.dart
-
-# Environment
-.env
-.env.*
-*.env
-
-# Logs
+# logs
+logs/
 *.log
+npm-debug.log*
 
-# Temporary
-*.tmp
-*.temp
+# variáveis de ambiente
+.env
+.env.local
 
-# Coverage
-coverage/
-
-# Generated
-generated_plugin_registrant.dart
-
-# Misc
+# sistema operacional
 .DS_Store
 Thumbs.db
+
+# editor
+.vscode/
+.idea/
