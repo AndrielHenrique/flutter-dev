@@ -1,26 +1,43 @@
-class Produto {
-  final int? id;
-  final String nome;
-  final double preco;
-  final int quantidade;
+import '../database/db_helper.dart';
+import '../model/produto_model.dart';
 
-  Produto({this.id, required this.nome, required this.preco, required this.quantidade});
+class ProdutoDAO {
+  static const String _tableName = 'produto';
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'nome': nome,
-      'preco': preco,
-      'quantidade': quantidade,
-    };
+  static Future<int> inserir(ProdutoModel produto) async {
+    final db = await DBHelper.getInstance();
+    return await db.insert(_tableName, produto.toMap());
   }
 
-  factory Produto.fromMap(Map<String, dynamic> map) {
-    return Produto(
-      id: map['id'] as int?,
-      nome: map['nome'] as String,
-      preco: map['preco'] as double,
-      quantidade: map['quantidade'] as int,
+  static Future<void> atualizar(ProdutoModel produto) async {
+    final db = await DBHelper.getInstance();
+    await db.update(
+      _tableName,
+      produto.toMap(),
+      where: 'codigo = ?',
+      whereArgs: [produto.codigo],
     );
+  }
+
+  static Future<void> deletar(String codigo) async {
+    final db = await DBHelper.getInstance();
+    await db.delete(_tableName, where: 'codigo = ?', whereArgs: [codigo]);
+  }
+
+  static Future<List<ProdutoModel>> carregarTodos() async {
+    final db = await DBHelper.getInstance();
+    final List<Map<String, dynamic>> result = await db.query(_tableName);
+    return result.map((e) => ProdutoModel.fromMap(e)).toList();
+  }
+
+  static Future<ProdutoModel?> buscarPorCodigo(String codigo) async {
+    final db = await DBHelper.getInstance();
+    final List<Map<String, dynamic>> result = await db.query(
+      _tableName,
+      where: 'codigo = ?',
+      whereArgs: [codigo],
+    );
+    if (result.isEmpty) return null;
+    return ProdutoModel.fromMap(result.first);
   }
 }
