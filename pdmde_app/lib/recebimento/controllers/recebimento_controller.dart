@@ -5,6 +5,7 @@ import '../../../dao/af_dao.dart';
 import '../../../dao/barra_dao.dart';
 import '../../../dao/recebimento_dao.dart';
 import '../../../http/dio_client.dart';
+import '../../../model/af_item_model.dart';
 import '../../../model/af_model.dart';
 import '../../../model/barra_model.dart';
 import '../../../model/recebimento_model.dart';
@@ -42,6 +43,12 @@ class RecebimentoController extends ChangeNotifier {
   double get pesoTotal => barras.fold(0.0, (s, b) => s + b.pesoBarra);
   int get totalRasuradas => barras.where((b) => b.isRasurada).length;
 
+  /// Quantas barras já foram adicionadas para um item específico do pedido.
+  /// Usado pela tela para desabilitar o botão "+ Barra" quando
+  /// `quantidadePedida` for atingida.
+  int qtdBarrasPorItem(String codigoMP) =>
+      barras.where((b) => b.codigoMP == codigoMP).length;
+
   // Init
 
   Future<void> _init() async {
@@ -78,10 +85,32 @@ class RecebimentoController extends ChangeNotifier {
     try {
       AfModel? af = await AfDAO.buscarPorNumero(numAF);
 
+      // Itens do pedido nunca são persistidos no SQLite (decisão de design).
+      // Por isso, mesmo quando a AF já existe localmente, os itens
+      // precisam ser buscados na API a cada chamada — senão a lista
+      // de itens fica sempre vazia a partir da segunda busca.
       if (af == null) {
         final response = await _dio.get('/af/$numAF');
         af = AfModel.fromApiMap(response.data as Map<String, dynamic>);
         await AfDAO.inserir(af);
+      } else if (af.itens.isEmpty) {
+        try {
+          final response = await _dio.get('/af/$numAF');
+          final AfModel afComItens = AfModel.fromApiMap(
+            response.data as Map<String, dynamic>,
+          );
+          af = AfModel(
+            id: af.id,
+            numAF: af.numAF,
+            descricao: af.descricao,
+            fornecedor: af.fornecedor,
+            pesoTotal: af.pesoTotal,
+            itens: afComItens.itens,
+          );
+        } on DioException catch (_) {
+          // Se a API estiver fora do ar, segue sem itens —
+          // AF já encontrada localmente continua usável.
+        }
       }
 
       List<BarraModel> lista = await BarraDAO.carregarPorAF(numAF);
@@ -150,13 +179,21 @@ class RecebimentoController extends ChangeNotifier {
 
   // CRUD barras
 
-  Future<void> adicionarBarra() async {
+  /// Adiciona uma barra vinculada ao [item] do pedido que o usuário
+  /// clicou. A barra nasce com o material do item já preenchido —
+  /// nunca com dados de outro item ou vazios.
+  Future<void> adicionarBarra(AfItemModel item) async {
+    // Defesa em profundidade: mesmo que o botão devesse estar
+    // desabilitado ao atingir a quantidade pedida, o controller
+    // nunca deve permitir passar disso.
+    if (qtdBarrasPorItem(item.codigoMP) >= item.quantidadePedida) return;
+
     final BarraModel nova = BarraModel(
       numAF: afSelecionada!.numAF,
       linha: barras.length + 1,
-      codigoMP: produtos.length == 1 ? produtos.first.codigo : '',
-      descricao: produtos.length == 1 ? produtos.first.descricao : '',
-      fornecedor: produtos.length == 1 ? produtos.first.fornecedor : '',
+      codigoMP: item.codigoMP,
+      descricao: item.descricao,
+      fornecedor: afSelecionada!.fornecedor,
       pesoBarra: 0,
       numeroBarra: '',
       isRasurada: false,

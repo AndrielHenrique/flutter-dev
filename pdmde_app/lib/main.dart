@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'login/login_page.dart';
 import 'home/home_page.dart';
+import 'recebimento/views/recebimento_view.dart';
+import 'recebimento/views/historico_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,7 +28,12 @@ class MyApp extends StatelessWidget {
 
       initialRoute: '/',
 
-      routes: {'/': (_) => const LoginPage(), '/home': (_) => const HomePage()},
+      routes: {
+        '/': (_) => const LoginPage(),
+        '/home': (_) => const HomePage(),
+        '/recebimento': (_) => const RecebimentoView(),
+        '/historico': (_) => const HistoricoView(),
+      },
     );
   }
 }

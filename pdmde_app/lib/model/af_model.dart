@@ -1,9 +1,12 @@
+import 'af_item_model.dart';
+
 class AfModel {
   final int? id;
   final String numAF;
   final String descricao;
   final String fornecedor;
   final double pesoTotal;
+  final List<AfItemModel> itens;
 
   const AfModel({
     this.id,
@@ -11,6 +14,7 @@ class AfModel {
     required this.descricao,
     required this.fornecedor,
     required this.pesoTotal,
+    this.itens = const [],
   });
 
   Map<String, dynamic> toMap() => {
@@ -27,13 +31,16 @@ class AfModel {
     descricao: map['descricao'] as String,
     fornecedor: map['fornecedor'] as String,
     pesoTotal: (map['pesoTotal'] as num).toDouble(),
+    // itens nao ficam no SQLite, vem da API
   );
 
-  // fromMap para JSON da API (chaves com inicial maiúscula)
   factory AfModel.fromApiMap(Map<String, dynamic> map) => AfModel(
     numAF: map['NumAF'] as String,
     descricao: map['Descricao'] as String,
     fornecedor: map['Fornecedor'] as String,
     pesoTotal: (map['PesoTotal'] as num).toDouble(),
+    itens: (map['Itens'] as List<dynamic>? ?? [])
+        .map((i) => AfItemModel.fromApiMap(i as Map<String, dynamic>))
+        .toList(),
   );
 }

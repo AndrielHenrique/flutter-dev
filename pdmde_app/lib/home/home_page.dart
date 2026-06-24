@@ -44,12 +44,18 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _handleActionTap(String actionTitle) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Você tocou em: $actionTitle"),
-        duration: const Duration(seconds: 2),
-      ),
-    );
+    switch (actionTitle) {
+      case 'Registrar Recebimento':
+        Navigator.pushNamed(context, '/recebimento');
+        break;
+      case 'Revisar Recebimento':
+        Navigator.pushNamed(context, '/historico');
+        break;
+      default:
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Você tocou em: $actionTitle')));
+    }
   }
 
   @override
@@ -64,10 +70,7 @@ class _HomePageState extends State<HomePage> {
         foregroundColor: Colors.white,
         title: const Text("Recebimento Genérico"),
         actions: [
-          IconButton(
-            onPressed: _handleLogout,
-            icon: const Icon(Icons.logout),
-          ),
+          IconButton(onPressed: _handleLogout, icon: const Icon(Icons.logout)),
         ],
       ),
       body: Column(
