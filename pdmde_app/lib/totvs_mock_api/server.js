@@ -25,7 +25,7 @@ app.get("/af/:numAF", (req, res) => {
 
 // POST /af  cria nova
 app.post("/af", (req, res) => {
-  const { NumAF, Descricao, Fornecedor, PesoTotal } = req.body;
+const { NumAF, Descricao, Fornecedor, PesoTotal, Itens } = req.body;
 
   if (!NumAF || !Descricao || !Fornecedor || !PesoTotal) {
     return res.status(400).json({ erro: "Campos obrigatórios: NumAF, Descricao, Fornecedor, PesoTotal." });
@@ -34,8 +34,7 @@ app.post("/af", (req, res) => {
   const existe = afs.find((a) => a.NumAF === NumAF);
   if (existe) return res.status(409).json({ erro: "AF já cadastrada." });
 
-  const nova = { NumAF, Descricao, Fornecedor, PesoTotal };
-  afs.push(nova);
+const nova = { NumAF, Descricao, Fornecedor, PesoTotal, Itens: Itens ?? [] };  afs.push(nova);
   return res.status(201).json(nova);
 });
 
