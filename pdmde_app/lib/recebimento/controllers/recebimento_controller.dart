@@ -85,32 +85,13 @@ class RecebimentoController extends ChangeNotifier {
     try {
       AfModel? af = await AfDAO.buscarPorNumero(numAF);
 
-      // Itens do pedido nunca são persistidos no SQLite (decisão de design).
-      // Por isso, mesmo quando a AF já existe localmente, os itens
-      // precisam ser buscados na API a cada chamada — senão a lista
-      // de itens fica sempre vazia a partir da segunda busca.
+      // Itens do pedido são persistidos no SQLite junto com a AF
+      // (coluna itensJson), uma vez que a AF foi salva localmente com
+      // seus itens, não é mais necessário buscar a API de novo só por isso.
       if (af == null) {
         final response = await _dio.get('/af/$numAF');
         af = AfModel.fromApiMap(response.data as Map<String, dynamic>);
         await AfDAO.inserir(af);
-      } else if (af.itens.isEmpty) {
-        try {
-          final response = await _dio.get('/af/$numAF');
-          final AfModel afComItens = AfModel.fromApiMap(
-            response.data as Map<String, dynamic>,
-          );
-          af = AfModel(
-            id: af.id,
-            numAF: af.numAF,
-            descricao: af.descricao,
-            fornecedor: af.fornecedor,
-            pesoTotal: af.pesoTotal,
-            itens: afComItens.itens,
-          );
-        } on DioException catch (_) {
-          // Se a API estiver fora do ar, segue sem itens —
-          // AF já encontrada localmente continua usável.
-        }
       }
 
       List<BarraModel> lista = await BarraDAO.carregarPorAF(numAF);
@@ -180,7 +161,7 @@ class RecebimentoController extends ChangeNotifier {
   // CRUD barras
 
   /// Adiciona uma barra vinculada ao [item] do pedido que o usuário
-  /// clicou. A barra nasce com o material do item já preenchido —
+  /// clicou. A barra nasce com o material do item já preenchido,
   /// nunca com dados de outro item ou vazios.
   Future<void> adicionarBarra(AfItemModel item) async {
     // Defesa em profundidade: mesmo que o botão devesse estar

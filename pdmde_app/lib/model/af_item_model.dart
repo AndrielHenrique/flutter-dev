@@ -24,4 +24,12 @@ class AfItemModel {
     'quantidadePedida': quantidadePedida,
     'pesoUnitario': pesoUnitario,
   };
+
+  // Reconstrói a partir do JSON salvo dentro da coluna itensJson do SQLite
+  factory AfItemModel.fromMap(Map<String, dynamic> map) => AfItemModel(
+    codigoMP: map['codigoMP'] as String,
+    descricao: map['descricao'] as String,
+    quantidadePedida: map['quantidadePedida'] as int,
+    pesoUnitario: (map['pesoUnitario'] as num).toDouble(),
+  );
 }

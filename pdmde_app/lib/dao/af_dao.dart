@@ -1,4 +1,5 @@
 import '../database/db_helper.dart';
+import '../model/af_item_model.dart';
 import '../model/af_model.dart';
 
 class AfDAO {
@@ -50,6 +51,20 @@ class AfDAO {
           descricao: 'Aço SAE 1045 — Barra Redonda',
           fornecedor: 'Aços Villares',
           pesoTotal: 1850.5,
+          itens: [
+            AfItemModel(
+              codigoMP: 'MP-1045-RD50',
+              descricao: 'SAE 1045 — Ø50mm',
+              quantidadePedida: 2,
+              pesoUnitario: 520.0,
+            ),
+            AfItemModel(
+              codigoMP: 'MP-1045-RD75',
+              descricao: 'SAE 1045 — Ø75mm',
+              quantidadePedida: 2,
+              pesoUnitario: 498.5,
+            ),
+          ],
         ),
       );
       await inserir(
@@ -58,6 +73,14 @@ class AfDAO {
           descricao: 'Aço SAE 4140 — Barra Sextavada',
           fornecedor: 'Gerdau Açominas',
           pesoTotal: 3240.0,
+          itens: [
+            AfItemModel(
+              codigoMP: 'MP-4140-SX36',
+              descricao: 'SAE 4140 — SW36mm',
+              quantidadePedida: 3,
+              pesoUnitario: 600.0,
+            ),
+          ],
         ),
       );
     }
