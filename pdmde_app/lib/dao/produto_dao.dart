@@ -1,4 +1,7 @@
+import 'package:dio/dio.dart';
+
 import '../database/db_helper.dart';
+import '../http/dio_client.dart';
 import '../model/produto_model.dart';
 
 class ProdutoDAO {
@@ -39,5 +42,29 @@ class ProdutoDAO {
     );
     if (result.isEmpty) return null;
     return ProdutoModel.fromMap(result.first);
+  }
+
+  static Future<void> salvarViaApi(
+    ProdutoModel produto, {
+    required bool editar,
+  }) async {
+    final dio = DioClient.getInstance();
+    try {
+      if (editar) {
+        await dio.put('/produtos/${produto.codigo}', data: produto.toApiMap());
+        return;
+      }
+      await dio.post('/produtos', data: produto.toApiMap());
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 409) {
+        return;
+      }
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout ||
+          e.type == DioExceptionType.sendTimeout) {
+        return;
+      }
+      rethrow;
+    }
   }
 }

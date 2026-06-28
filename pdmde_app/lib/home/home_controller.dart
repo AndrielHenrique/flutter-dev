@@ -26,6 +26,17 @@ class HomeController {
         "admin": false,
       },
       {
+        "title": "Cadastrar AF",
+
+        "subtitle": "Criar ou editar uma AF",
+
+        "icon": Icons.assignment_add,
+
+        "color": const Color(0xFF8B5CF6),
+
+        "admin": false,
+      },
+      {
         "title": "Cadastrar Usuários",
 
         "subtitle": "Gerenciar acessos",

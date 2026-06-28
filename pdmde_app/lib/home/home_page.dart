@@ -51,6 +51,9 @@ class _HomePageState extends State<HomePage> {
       case 'Revisar Recebimento':
         Navigator.pushNamed(context, '/historico');
         break;
+      case 'Cadastrar AF':
+        Navigator.pushNamed(context, '/af-lista');
+        break;
       default:
         ScaffoldMessenger.of(
           context,
@@ -70,6 +73,11 @@ class _HomePageState extends State<HomePage> {
         foregroundColor: Colors.white,
         title: const Text("Recebimento Genérico"),
         actions: [
+          IconButton(
+            onPressed: () => Navigator.pushNamed(context, '/perfil'),
+            icon: const Icon(Icons.person_outline),
+            tooltip: 'Editar perfil',
+          ),
           IconButton(onPressed: _handleLogout, icon: const Icon(Icons.logout)),
         ],
       ),

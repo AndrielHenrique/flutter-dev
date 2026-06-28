@@ -11,13 +11,18 @@ class DBHelper {
     final String databasesPath = await getDatabasesPath();
     final String path = join(databasesPath, dbName);
 
-    _instance = await openDatabase(path, version: 1, onCreate: _onCreate);
+    _instance = await openDatabase(
+      path,
+      version: 2,
+      onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
+    );
     return _instance!;
   }
 
   static Future<void> _onCreate(Database db, int ver) async {
     await db.execute(
-      'CREATE TABLE usuario(id INTEGER PRIMARY KEY, nome TEXT, email TEXT)',
+      'CREATE TABLE usuario(id INTEGER PRIMARY KEY, nome TEXT, email TEXT, senha TEXT)',
     );
     await db.execute(
       'CREATE TABLE fornecedor(id INTEGER PRIMARY KEY, nome TEXT, cnpj TEXT)',
@@ -70,5 +75,19 @@ class DBHelper {
         barrasJson TEXT
       )
     ''');
+  }
+
+  static Future<void> _onUpgrade(
+    Database db,
+    int oldVersion,
+    int newVersion,
+  ) async {
+    if (oldVersion < 2) {
+      final columns = await db.rawQuery('PRAGMA table_info(usuario)');
+      final hasSenha = columns.any((column) => column['name'] == 'senha');
+      if (!hasSenha) {
+        await db.execute('ALTER TABLE usuario ADD COLUMN senha TEXT');
+      }
+    }
   }
 }

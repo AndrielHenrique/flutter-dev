@@ -1,4 +1,7 @@
+import 'package:dio/dio.dart';
+
 import '../database/db_helper.dart';
+import '../http/dio_client.dart';
 import '../model/af_item_model.dart';
 import '../model/af_model.dart';
 
@@ -40,6 +43,28 @@ class AfDAO {
     );
     if (result.isEmpty) return null;
     return AfModel.fromMap(result.first);
+  }
+
+  static Future<void> salvarViaApi(AfModel af, {required bool editar}) async {
+    final dio = DioClient.getInstance();
+    try {
+      final payload = af.toApiMap();
+      if (editar) {
+        await dio.put('/af/${af.numAF}', data: payload);
+        return;
+      }
+      await dio.post('/af', data: payload);
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout ||
+          e.type == DioExceptionType.sendTimeout) {
+        return;
+      }
+      if (e.response?.statusCode == 409) {
+        return;
+      }
+      rethrow;
+    }
   }
 
   static Future<void> seedInicial() async {

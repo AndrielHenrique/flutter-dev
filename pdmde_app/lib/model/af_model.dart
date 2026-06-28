@@ -30,6 +30,14 @@ class AfModel {
     'itensJson': jsonEncode(itens.map((i) => i.toMap()).toList()),
   };
 
+  Map<String, dynamic> toApiMap() => {
+    'NumAF': numAF,
+    'Descricao': descricao,
+    'Fornecedor': fornecedor,
+    'PesoTotal': pesoTotal,
+    'Itens': itens.map((i) => i.toMap()).toList(),
+  };
+
   factory AfModel.fromMap(Map<String, dynamic> map) {
     final List<dynamic> itensRaw =
         jsonDecode(map['itensJson'] as String? ?? '[]') as List<dynamic>;
@@ -53,5 +61,21 @@ class AfModel {
     itens: (map['Itens'] as List<dynamic>? ?? [])
         .map((i) => AfItemModel.fromApiMap(i as Map<String, dynamic>))
         .toList(),
+  );
+
+  AfModel copyWith({
+    int? id,
+    String? numAF,
+    String? descricao,
+    String? fornecedor,
+    double? pesoTotal,
+    List<AfItemModel>? itens,
+  }) => AfModel(
+    id: id ?? this.id,
+    numAF: numAF ?? this.numAF,
+    descricao: descricao ?? this.descricao,
+    fornecedor: fornecedor ?? this.fornecedor,
+    pesoTotal: pesoTotal ?? this.pesoTotal,
+    itens: itens ?? this.itens,
   );
 }

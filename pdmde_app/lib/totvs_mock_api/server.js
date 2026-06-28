@@ -171,6 +171,7 @@ app.delete("/produtos/:codigo", (req, res) => {
 
 // ══════════════════════════════════════════════════════
 const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`API TOTVS Mock rodando em http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`API TOTVS Mock rodando em http://0.0.0.0:${PORT}`);
+  console.log(`Também disponível em http://<IP-do-seu-computador>:${PORT}`);
 });

@@ -4,6 +4,9 @@ import 'login/login_page.dart';
 import 'home/home_page.dart';
 import 'recebimento/views/recebimento_view.dart';
 import 'recebimento/views/historico_view.dart';
+import 'recebimento/views/af_cadastro_view.dart';
+import 'recebimento/views/af_lista_view.dart';
+import 'perfil/perfil_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -33,6 +36,9 @@ class MyApp extends StatelessWidget {
         '/home': (_) => const HomePage(),
         '/recebimento': (_) => const RecebimentoView(),
         '/historico': (_) => const HistoricoView(),
+        '/af-cadastro': (_) => const AfCadastroView(),
+        '/af-lista': (_) => const AfListaView(),
+        '/perfil': (_) => const PerfilView(),
       },
     );
   }
