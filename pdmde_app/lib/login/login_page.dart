@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'login_controller.dart';
 
 class LoginPage extends StatefulWidget {
@@ -31,11 +30,12 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void handleLogin() {
+  // Mudamos para async para conseguir esperar a resposta do banco de dados
+  void handleLogin() async {
     final username = usernameController.text.trim();
     final password = passwordController.text;
 
-    if (!controller.validateLogin(username: username, password: password)) {
+    if (username.isEmpty || password.isEmpty) {
       _showErrorMessage("Preencha usuário e senha corretamente");
       return;
     }
@@ -50,8 +50,20 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    final isAdmin = controller.isAdmin(username: username, password: password);
-    Navigator.pushReplacementNamed(context, '/home', arguments: isAdmin);
+    // Colocamos o await para aguardar a checagem das credenciais no SQLite
+    bool loginSucesso = await controller.validateLogin(
+      username: username, 
+      password: password,
+    );
+
+    if (!mounted) return;
+
+    if (loginSucesso) {
+      final isAdmin = controller.isAdmin(username: username, password: password);
+      Navigator.pushReplacementNamed(context, '/home', arguments: isAdmin);
+    } else {
+      _showErrorMessage("E-mail ou senha incorretos!");
+    }
   }
 
   void _showErrorMessage(String message) {
@@ -70,69 +82,51 @@ class _LoginPageState extends State<LoginPage> {
 
     return Scaffold(
       backgroundColor: primary,
-
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
-
           child: Container(
             constraints: const BoxConstraints(maxWidth: 420),
-
             padding: const EdgeInsets.all(28),
-
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.14),
-
               borderRadius: BorderRadius.circular(36),
             ),
-
             child: Column(
               children: [
                 Container(
                   width: 110,
                   height: 110,
-
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.12),
-
                     borderRadius: BorderRadius.circular(28),
                   ),
-
                   child: const Icon(
                     Icons.inventory_2,
                     color: Colors.white,
                     size: 50,
                   ),
                 ),
-
                 const SizedBox(height: 24),
-
                 const Text(
                   "Recebimento Genérico",
                   textAlign: TextAlign.center,
-
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-
                 const SizedBox(height: 8),
-
                 Text(
                   "Faça login para acessar o sistema",
                   textAlign: TextAlign.center,
-
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.75),
-
                     fontSize: 16,
                   ),
                 ),
-
                 const SizedBox(height: 32),
-
                 TextField(
                   controller: usernameController,
                   keyboardType: TextInputType.emailAddress,
@@ -147,65 +141,46 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 16),
-
                 TextField(
                   controller: passwordController,
-
                   obscureText: !showPassword,
-
                   decoration: InputDecoration(
                     hintText: "Senha",
-
                     filled: true,
-
                     fillColor: Colors.white,
-
                     prefixIcon: const Icon(Icons.lock),
-
                     suffixIcon: IconButton(
                       onPressed: () {
                         setState(() {
                           showPassword = !showPassword;
                         });
                       },
-
                       icon: Icon(
                         showPassword ? Icons.visibility : Icons.visibility_off,
                       ),
                     ),
-
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(18),
-
                       borderSide: BorderSide.none,
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 24),
-
                 SizedBox(
                   width: double.infinity,
                   height: 58,
-
                   child: ElevatedButton(
                     onPressed: handleLogin,
-
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
-
                       foregroundColor: primary,
-
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-
                     child: const Text(
                       "Entrar",
-
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,

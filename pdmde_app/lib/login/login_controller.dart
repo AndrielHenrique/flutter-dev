@@ -1,10 +1,22 @@
+  import '../dao/usuario_dao.dart';
+  import '../model/usuario.dart';
+
+
 class LoginController {
   bool isAdmin({required String username, required String password}) {
     return username == "admin@example.com" && password == "admin123";
   }
 
-  bool validateLogin({required String username, required String password}) {
-    return username.isNotEmpty && password.isNotEmpty;
+   Future<bool> validateLogin({required String username, required String password}) async {
+    if (username.isEmpty || password.isEmpty) {
+      return false;
+    }
+    
+    // Busca o usuário direto no banco de dados local
+    Usuario? usuario = await UsuarioDAO.buscarPorEmailESenha(username, password);
+    
+    // Retorna verdadeiro se encontrou o usuário, falso se não encontrou
+    return usuario != null;
   }
 
   bool isValidEmail(String email) {

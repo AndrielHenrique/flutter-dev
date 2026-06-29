@@ -24,4 +24,19 @@ class UsuarioDAO {
     List<Map<String, dynamic>> result = await db.query(_tableName);
     return result.map((e) => Usuario.fromMap(e)).toList();
   }
+
+    static Future<Usuario?> buscarPorEmailESenha(String email, String senha) async {
+    var db = await DBHelper.getInstance();
+    List<Map<String, dynamic>> result = await db.query(
+      _tableName,
+      where: 'email = ? AND senha = ?',
+      whereArgs: [email, senha],
+    );
+
+    if (result.isNotEmpty) {
+      return Usuario.fromMap(result.first);
+    }
+    return null;
+  }
+
 }

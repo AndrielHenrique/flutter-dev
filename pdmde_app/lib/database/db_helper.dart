@@ -17,20 +17,21 @@ class DBHelper {
 
   static Future<void> _onCreate(Database db, int ver) async {
     await db.execute(
-      'CREATE TABLE usuario(id INTEGER PRIMARY KEY, nome TEXT, email TEXT)',
+      'CREATE TABLE usuario(id INTEGER PRIMARY KEY, nome TEXT, email TEXT, senha TEXT)',
     );
+    
     await db.execute(
       'CREATE TABLE fornecedor(id INTEGER PRIMARY KEY, nome TEXT, cnpj TEXT)',
     );
+    
     await db.execute(
-      'CREATE TABLE produto(codigo TEXT PRIMARY KEY, descricao TEXT, fornecedor TEXT, saldoDisponivel REAL)',
+      'CREATE TABLE produto(codigo TEXT PRIMARY KEY, descricao TEXT, fornecedor TEXT, preco REAL, quantidade INTEGER)',
     );
+    
     await db.execute(
       'CREATE TABLE permissao(id INTEGER PRIMARY KEY, nomePermissao TEXT, descricao TEXT)',
     );
 
-    // Itens do pedido são persistidos junto com a AF,
-    // serializados como JSON na coluna itensJson.
     await db.execute('''
       CREATE TABLE af(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -70,5 +71,11 @@ class DBHelper {
         barrasJson TEXT
       )
     ''');
+
+    await db.insert('usuario', {
+      'nome': 'Administrador',
+      'email': 'admin@example.com',
+      'senha': '1234',
+    });
   }
 }
