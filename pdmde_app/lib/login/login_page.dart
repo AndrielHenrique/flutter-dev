@@ -30,7 +30,6 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  // Mudamos para async para conseguir esperar a resposta do banco de dados
   void handleLogin() async {
     final username = usernameController.text.trim();
     final password = passwordController.text;
@@ -50,17 +49,15 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    // Colocamos o await para aguardar a checagem das credenciais no SQLite
-    bool loginSucesso = await controller.validateLogin(
+    String? nomeUsuario = await controller.validateLogin(
       username: username, 
       password: password,
     );
 
     if (!mounted) return;
 
-    if (loginSucesso) {
-      final isAdmin = controller.isAdmin(username: username, password: password);
-      Navigator.pushReplacementNamed(context, '/home', arguments: isAdmin);
+    if (nomeUsuario != null) {
+      Navigator.pushReplacementNamed(context, '/home', arguments: nomeUsuario);
     } else {
       _showErrorMessage("E-mail ou senha incorretos!");
     }
