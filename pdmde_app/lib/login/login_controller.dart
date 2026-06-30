@@ -7,15 +7,17 @@ class LoginController {
     return username == "admin@example.com" && password == "admin123";
   }
 
-    Future<String?> validateLogin({required String username, required String password}) async {
+   Future<bool> validateLogin({required String username, required String password}) async {
     if (username.isEmpty || password.isEmpty) {
-      return null;
+      return false;
     }
     
+    // Busca o usuário direto no banco de dados local
     Usuario? usuario = await UsuarioDAO.buscarPorEmailESenha(username, password);
-    return usuario?.nome;
+    
+    // Retorna verdadeiro se encontrou o usuário, falso se não encontrou
+    return usuario != null;
   }
-
 
   bool isValidEmail(String email) {
     final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
